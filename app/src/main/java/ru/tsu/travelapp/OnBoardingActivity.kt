@@ -17,11 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.tsu.travelapp.ui.theme.TravelAppTheme
 
 class OnBoardingActivity : ComponentActivity() {
     private var step = 1
@@ -60,50 +59,52 @@ class OnBoardingActivity : ComponentActivity() {
         @DrawableRes
         itemsPic: Int,
     ) {
-        Column {
-            Box(
-                modifier = Modifier.padding(top = 45.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = manPic),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
+        TravelAppTheme {
+            Column {
+                Box(
+                    modifier = Modifier.padding(top = 45.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = manPic),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 50.dp)
+                    )
+                    Image(
+                        painter = painterResource(id = itemsPic),
+                        contentDescription = null,
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = {
+                        if (step < 3) {
+                            step++
+                        } else {
+                            startActivity(Intent(this@OnBoardingActivity,
+                                LoginActivity::class.java))
+                            finish()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(id = R.color.orange),
+                        contentColor = colorResource(id = R.color.white)
+                    ),
+                    shape = RoundedCornerShape(7.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 50.dp)
-                )
-                Image(
-                    painter = painterResource(id = itemsPic),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    if(step < 3) {
-                        step++
-                    } else {
-                        startActivity(Intent(this@OnBoardingActivity, LoginActivity::class.java))
-                        finish()
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = colorResource(id = R.color.orange),
-                    contentColor = colorResource(id = R.color.white)
-                ),
-                shape = RoundedCornerShape(7.dp),
-                modifier = Modifier
-                    .padding(bottom = 50.dp, end = 10.dp)
-                    .align(Alignment.End)
-            ) {
-                Text(
-                    text = if (step < 3) "Продолжить" else "Начать",
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(resId = R.font.roboto_slab))
-                )
+                        .padding(bottom = 50.dp, end = 10.dp)
+                        .align(Alignment.End)
+                ) {
+                    Text(
+                        text = if (step < 3) "Продолжить" else "Начать",
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }
