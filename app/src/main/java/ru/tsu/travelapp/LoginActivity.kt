@@ -59,6 +59,8 @@ class LoginActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     onClick = {
+                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        finish()
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = colorResource(id = R.color.orange_alpha),
