@@ -1,10 +1,12 @@
 package ru.tsu.travelapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,8 +33,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import ru.tsu.travelapp.ui.theme.TravelAppTheme
+
+
+data class BottomNavItem(
+    val name: String,
+    @DrawableRes
+    val icon: Int
+)
+
+private val bottomNavItems = listOf(
+    BottomNavItem("Home", R.drawable.ic_home),
+    BottomNavItem("Gallery", R.drawable.ic_gallery),
+    BottomNavItem("Map", R.drawable.ic_map),
+    BottomNavItem("Notifications", R.drawable.ic_notifications),
+    BottomNavItem("Profile", R.drawable.ic_profile)
+)
 
 class MainActivity : ComponentActivity() {
 
@@ -50,8 +72,89 @@ private fun Preview() {
     SetupView()
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 private fun SetupView() {
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = { BottomNav(navController = navController) }
+    ) {
+        NavGraph(navController = navController)
+    }
+}
+
+@Composable
+private fun BottomNav(navController: NavHostController) {
+    BottomNavigation(
+        backgroundColor = colorResource(id = R.color.white),
+        modifier = Modifier
+            .height(51.dp)
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        bottomNavItems.forEach { item ->
+            val isSelected = currentRoute == item.name
+            BottomNavigationItem(
+                selected = isSelected,
+                icon = {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Image(
+                            painter = painterResource(
+                                id = item.icon
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(21.dp)
+                                .align(Alignment.Center)
+                        )
+                        if(isSelected) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_active),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(5.dp)
+                                    .align(Alignment.BottomCenter)
+                            )
+                        }
+                    }
+                },
+                onClick = {
+                    navController.navigate(item.name) {
+                        navController.graph.startDestinationRoute?.let {
+                            popUpTo(it) {
+                                saveState = true
+                            }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun NavGraph(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = bottomNavItems.first().name,
+    ) {
+        composable(bottomNavItems.first().name) { MainScreen() }
+        composable(bottomNavItems[1].name) {}
+        composable(bottomNavItems[2].name) {}
+        composable(bottomNavItems[3].name) {}
+        composable(bottomNavItems.last().name) { ProfileScreen() }
+    }
+}
+
+@Composable
+private fun MainScreen() {
     var searchQuery by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
@@ -73,7 +176,7 @@ private fun SetupView() {
         )
     }
 
-    val imageUrl = "https://media.baamboozle.com/uploads/images/37562/1589041812_179097"
+    val imageUrl = "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
     val images = List(5) { imageUrl }
 
     TravelAppTheme {
@@ -82,7 +185,7 @@ private fun SetupView() {
                 .background(color = colorResource(id = R.color.white))
         ) {
             item {
-                Spacer(Modifier.size(37.dp))
+                Spacer(Modifier.size(30.dp))
                 TextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -191,6 +294,14 @@ private fun SetupView() {
                 }
                 Spacer(modifier = Modifier.size(16.dp))
             }
+            item {
+                Spacer(modifier = Modifier.size(51.dp))
+            }
         }
     }
+}
+
+@Composable
+private fun ProfileScreen() {
+
 }
