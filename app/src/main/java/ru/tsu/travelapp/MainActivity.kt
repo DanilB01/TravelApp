@@ -3,6 +3,7 @@ package ru.tsu.travelapp
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -33,12 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.tsu.travelapp.ui.theme.TravelAppTheme
 
 
@@ -60,6 +64,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
         setContent {
             SetupView()
         }
@@ -75,6 +83,13 @@ private fun Preview() {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 private fun SetupView() {
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !isSystemInDarkTheme()
+    systemUiController.setSystemBarsColor(
+        color = Color.Transparent,
+        darkIcons = useDarkIcons
+    )
+
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNav(navController = navController) }
@@ -110,7 +125,7 @@ private fun BottomNav(navController: NavHostController) {
                                 .size(21.dp)
                                 .align(Alignment.Center)
                         )
-                        if(isSelected) {
+                        if (isSelected) {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_active),
                                 contentDescription = null,
@@ -176,7 +191,8 @@ private fun MainScreen() {
         )
     }
 
-    val imageUrl = "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
+    val imageUrl =
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
     val images = List(5) { imageUrl }
 
     TravelAppTheme {
