@@ -13,4 +13,7 @@
 
     <color name="grey_light_alpha">#33A8B6C8</color>
     <color name="grey_light">#A8B6C8</color>
+
+    <color name="description_color">#5C6979</color>
+    <color name="title_color">#323B45</color>
 </resources>
