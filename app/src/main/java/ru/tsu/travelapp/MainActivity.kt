@@ -5,15 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +37,11 @@ import coil.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.tsu.travelapp.ui.theme.TravelAppTheme
 
+data class City(
+    val name: String = "",
+    val imageUrl: String = "",
+    val rating: Int = 0
+)
 
 data class BottomNavItem(
     val name: String,
@@ -165,12 +168,12 @@ private fun NavGraph(navController: NavHostController) {
 @Composable
 private fun MainScreen() {
     var searchQuery by remember { mutableStateOf("") }
-    var isSearchState by remember { mutableStateOf(false)}
+    var isSearchState by remember { mutableStateOf(false) }
 
-    var cityDetails by remember { mutableStateOf(Pair("","")) }
-    if(cityDetails.first.isNotBlank()) {
+    var cityDetails by remember { mutableStateOf(City()) }
+    if (cityDetails.name.isNotBlank()) {
         DetailsScreen(cityDetails) {
-            cityDetails = Pair("","")
+            cityDetails = City()
         }
         return
     }
@@ -199,16 +202,16 @@ private fun MainScreen() {
         "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
 
     val cities = listOf(
-        Pair("Новокузнецк", imageUrl),
-        Pair("Екатеринбург", imageUrl),
-        Pair("Калининград", imageUrl),
-        Pair("Владивосток", imageUrl),
-        Pair("Петропавловск-Камчатский", imageUrl),
-        Pair("Иркутск", imageUrl),
-        Pair("Казань", imageUrl),
-        Pair("Воркута", imageUrl),
-        Pair("Магадан", imageUrl),
-        Pair("Архангельск", imageUrl)
+        City("Новокузнецк", imageUrl, 5),
+        City("Екатеринбург", imageUrl, 4),
+        City("Калининград", imageUrl, 5),
+        City("Владивосток", imageUrl, 3),
+        City("Петропавловск-Камчатский", imageUrl, 2),
+        City("Иркутск", imageUrl, 0),
+        City("Казань", imageUrl, 4),
+        City("Воркута", imageUrl, 1),
+        City("Магадан", imageUrl, 5),
+        City("Архангельск", imageUrl, 2)
     )
 
     var currentCities by remember { mutableStateOf(cities) }
@@ -226,7 +229,7 @@ private fun MainScreen() {
                         searchQuery = it
                         isSearchState = searchQuery.isNotEmpty()
                         currentCities = cities.filter {
-                            it.first.contains(searchQuery, ignoreCase = true)
+                            it.name.contains(searchQuery, ignoreCase = true)
                         }
                     },
                     leadingIcon = {
@@ -255,7 +258,7 @@ private fun MainScreen() {
                         .padding(horizontal = 32.dp)
                         .shadow(1.dp)
                 )
-                if(!isSearchState) {
+                if (!isSearchState) {
                     Text(
                         text = "Рекомендации",
                         fontWeight = FontWeight.Bold,
@@ -285,7 +288,7 @@ private fun MainScreen() {
                                         .align(Alignment.BottomCenter)
                                 )
                                 AsyncImage(
-                                    model = city.second,
+                                    model = city.imageUrl,
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
@@ -293,7 +296,7 @@ private fun MainScreen() {
                                         .clip(RoundedCornerShape(8.dp))
                                 )
                                 Text(
-                                    text = city.first,
+                                    text = city.name,
                                     fontSize = 14.sp,
                                     color = colorResource(id = R.color.white),
                                     modifier = Modifier
@@ -316,13 +319,14 @@ private fun MainScreen() {
             }
             items(currentCities) { city ->
                 Box(
-                    modifier = Modifier.padding(horizontal = 22.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 22.dp)
                         .clickable {
                             cityDetails = city
                         }
                 ) {
                     AsyncImage(
-                        model = city.second,
+                        model = city.imageUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -331,7 +335,7 @@ private fun MainScreen() {
                             .clip(RoundedCornerShape(8.dp))
                     )
                     Text(
-                        text = city.first,
+                        text = city.name,
                         fontSize = 14.sp,
                         color = colorResource(id = R.color.white),
                         modifier = Modifier
@@ -349,56 +353,128 @@ private fun MainScreen() {
 }
 
 @Composable
-private fun DetailsScreen(cityDetails: Pair<String, String>, exit: () -> Unit) {
-    LazyColumn {
-        item {
-            Box {
-                AsyncImage(
-                    model = cityDetails.second,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(225.dp)
-                        .clip(RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp))
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.ic_arrow_back),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(26.dp)
-                        .size(height = 15.dp, width = 30.dp)
-                        .clickable { exit() }
-                )
-                Text(
-                    text = cityDetails.first,
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 26.dp, bottom = 16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.size(30.dp))
-            Text(
-                text = "Кра́сная пло́щадь — главная площадь Москвы, расположена между Московским Кремлём (к западу) и Китай-городом (на восток). Выходит к берегу Москвы-реки через пологий Васильевский спуск. Площадь тянется вдоль северо-восточной стены Кремля, от Кремлёвского проезда и проезда Воскресенские Ворота до Васильевского спуска, выходящего к Кремлёвской набережной. На восток от Красной площади отходят Никольская улица, Ильинка и Варварка. Вдоль западной стороны площади расположен Московский Кремль, вдоль восточной — Верхние торговые ряды и Средние торговые ряды. Входит в единый ансамбль с Московским Кремлём, однако исторически является частью Китай-города",
-                color = colorResource(id = R.color.description_color),
-                fontSize = 14.sp,
+private fun DetailsScreen(cityDetails: City, exit: () -> Unit) {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Box {
+            AsyncImage(
+                model = cityDetails.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
-                    .padding(horizontal = 30.dp)
+                    .fillMaxWidth()
+                    .height(225.dp)
+                    .clip(RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp))
             )
-            Spacer(modifier = Modifier.size(30.dp))
+            Image(
+                painter = painterResource(id = R.drawable.ic_arrow_back),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(26.dp)
+                    .size(height = 15.dp, width = 30.dp)
+                    .clickable { exit() }
+            )
             Text(
-                text = "Рейтинг",
-                color = colorResource(id = R.color.title_color),
-                fontSize = 18.sp,
-                modifier = Modifier.padding(horizontal = 30.dp)
+                text = cityDetails.name,
+                color = Color.White,
+                fontSize = 30.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 26.dp, bottom = 16.dp)
             )
         }
+
+        Spacer(modifier = Modifier.size(30.dp))
+        Text(
+            text = "Кра́сная пло́щадь — главная площадь Москвы, расположена между Московским Кремлём (к западу) и Китай-городом (на восток). Выходит к берегу Москвы-реки через пологий Васильевский спуск. Площадь тянется вдоль северо-восточной стены Кремля, от Кремлёвского проезда и проезда Воскресенские Ворота до Васильевского спуска, выходящего к Кремлёвской набережной. На восток от Красной площади отходят Никольская улица, Ильинка и Варварка. Вдоль западной стороны площади расположен Московский Кремль, вдоль восточной — Верхние торговые ряды и Средние торговые ряды. Входит в единый ансамбль с Московским Кремлём, однако исторически является частью Китай-города",
+            color = colorResource(id = R.color.description_color),
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(horizontal = 30.dp)
+        )
+        Spacer(modifier = Modifier.size(30.dp))
+        Text(
+            text = "Рейтинг",
+            color = colorResource(id = R.color.title_color),
+            fontSize = 18.sp,
+            modifier = Modifier.padding(horizontal = 25.dp)
+        )
+        Spacer(modifier = Modifier.size(16.dp))
+
+        Row(modifier = Modifier.padding(start = 25.dp)) {
+            for (i in 1..5) {
+                Image(
+                    painter = painterResource(id = if (cityDetails.rating >= i) R.drawable.ic_star_filled else R.drawable.ic_star_empty),
+                    contentDescription = null,
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+            }
+        }
+        Spacer(modifier = Modifier.size(100.dp))
     }
 }
 
 @Composable
 private fun ProfileScreen() {
+    TravelAppTheme {
+        Column {
+            Box {
+                Image(
+                    painter = painterResource(id = R.drawable.pic_profile_blured),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(bottom = 28.dp)
+                        .fillMaxWidth()
+                        .height(185.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.pic_avatar),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(percent = 100))
+                        .align(Alignment.BottomCenter)
+                        .size(100.dp)
+                )
+                Text(
+                    text = "Профиль",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 16.dp)
+                )
+                Text(
+                    text = "Выйти",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.size(20.dp))
 
+            var name by remember { mutableStateOf("") }
+            var city by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
+
+            Text(
+                text = "Имя",
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.description_color),
+                modifier = Modifier.padding(start = 25.dp)
+            )
+            TextField(
+                value = name,
+                onValueChange = { name = it },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.White
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+            )
+        }
+    }
 }
