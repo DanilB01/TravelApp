@@ -34,6 +34,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import ru.tsu.travelapp.ui.theme.TravelAppTheme
 
@@ -412,10 +413,11 @@ private fun DetailsScreen(cityDetails: City, exit: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ProfileScreen() {
     TravelAppTheme {
-        Column {
+        Column(Modifier.verticalScroll(rememberScrollState())) {
             Box {
                 Image(
                     painter = painterResource(id = R.drawable.pic_profile_blured),
@@ -529,6 +531,38 @@ private fun ProfileScreen() {
                 color = colorResource(id = R.color.description_color),
                 modifier = Modifier.padding(start = 25.dp)
             )
+
+            FlowRow(
+                mainAxisSpacing = 16.dp,
+                modifier = Modifier
+                    .padding(
+                        horizontal = 36.dp,
+                        vertical = 21.dp
+                    )
+            ){
+                val items = listOf(
+                    "Новокузнецк, Россия",
+                    "Екатеринбург, Россия",
+                    "Калининград, Россия",
+                    "Владивосток, Россия",
+                    "Петропавловск-Камчатский, Россия",
+                    "Иркутск, Россия",
+                    "Казань, Россия",
+                    "Воркута, Россия",
+                    "Магадан, Россия",
+                    "Архангельск, Россия"
+                )
+                for (item in items) {
+                    Chip(
+                        colors = ChipDefaults.chipColors(backgroundColor = colorResource(id = R.color.chip_color)),
+                        onClick = {}) {
+                        Text(
+                            text = item
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.size(51.dp))
         }
     }
 }

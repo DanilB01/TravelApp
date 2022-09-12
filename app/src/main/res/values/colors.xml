@@ -15,5 +15,7 @@
     <color name="grey_light">#A8B6C8</color>
 
     <color name="description_color">#5C6979</color>
-    <color name="title_color">#323B45</color>
+    <color name="title_color">#323B45</color>\
+
+    <color name="chip_color">#26A8B6C8</color>
 </resources>
