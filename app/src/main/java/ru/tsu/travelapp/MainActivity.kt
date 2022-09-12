@@ -72,9 +72,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    TravelAppTheme {
-        SetupView()
-    }
+    ProfileScreen()
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -465,15 +463,71 @@ private fun ProfileScreen() {
                 color = colorResource(id = R.color.description_color),
                 modifier = Modifier.padding(start = 25.dp)
             )
-            TextField(
+            Spacer(modifier = Modifier.size(9.dp))
+            BasicTextField(
                 value = name,
                 onValueChange = { name = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White
-                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 25.dp)
+            )
+            Spacer(modifier = Modifier.size(9.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .padding(horizontal = 25.dp)
+                .background(colorResource(id = R.color.grey_light))
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Text(
+                text = "Город",
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.description_color),
+                modifier = Modifier.padding(start = 25.dp)
+            )
+            Spacer(modifier = Modifier.size(9.dp))
+            BasicTextField(
+                value = city,
+                onValueChange = { city = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .padding(horizontal = 25.dp)
+                .background(colorResource(id = R.color.grey_light))
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Text(
+                text = "E-mail",
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.description_color),
+                modifier = Modifier.padding(start = 25.dp)
+            )
+            Spacer(modifier = Modifier.size(9.dp))
+            BasicTextField(
+                value = email,
+                onValueChange = { email = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 25.dp)
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .padding(horizontal = 25.dp)
+                .background(colorResource(id = R.color.grey_light))
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Text(
+                text = "Посещенные",
+                fontSize = 14.sp,
+                color = colorResource(id = R.color.description_color),
+                modifier = Modifier.padding(start = 25.dp)
             )
         }
     }
