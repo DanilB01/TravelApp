@@ -2,8 +2,10 @@ package ru.tsu.travelapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.ContentView
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,6 +66,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             TravelAppTheme {
                 SetupView()
@@ -73,7 +78,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    ProfileScreen()
+    SetupView()
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -90,7 +95,11 @@ private fun SetupView() {
     Scaffold(
         bottomBar = { BottomNav(navController = navController) }
     ) {
-        NavGraph(navController = navController)
+        Box(
+            modifier = Modifier.padding(it)
+        ) {
+            NavGraph(navController = navController)
+        }
     }
 }
 
@@ -99,7 +108,7 @@ private fun BottomNav(navController: NavHostController) {
     BottomNavigation(
         backgroundColor = colorResource(id = R.color.white),
         modifier = Modifier
-            .height(51.dp)
+            .navigationBarsPadding()
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -112,6 +121,19 @@ private fun BottomNav(navController: NavHostController) {
                     Box(
                         modifier = Modifier.fillMaxSize()
                     ) {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.White,
+                                            Color.LightGray
+                                        )
+                                    )
+                                )
+                        )
                         Image(
                             painter = painterResource(
                                 id = item.icon
@@ -219,9 +241,10 @@ private fun MainScreen() {
         LazyColumn(
             modifier = Modifier
                 .background(color = colorResource(id = R.color.white))
+                .statusBarsPadding()
         ) {
             item {
-                Spacer(Modifier.size(30.dp))
+                Spacer(Modifier.size(16.dp))
                 TextField(
                     value = searchQuery,
                     onValueChange = {
@@ -344,9 +367,6 @@ private fun MainScreen() {
                 }
                 Spacer(modifier = Modifier.size(16.dp))
             }
-            item {
-                Spacer(modifier = Modifier.size(51.dp))
-            }
         }
     }
 }
@@ -368,6 +388,7 @@ private fun DetailsScreen(cityDetails: City, exit: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_arrow_back),
                 contentDescription = null,
                 modifier = Modifier
+                    .statusBarsPadding()
                     .padding(26.dp)
                     .size(height = 15.dp, width = 30.dp)
                     .clickable { exit() }
@@ -442,7 +463,7 @@ private fun ProfileScreen() {
                     fontSize = 16.sp,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .padding(top = 16.dp)
+                        .statusBarsPadding()
                 )
                 Text(
                     text = "Выйти",
@@ -450,7 +471,8 @@ private fun ProfileScreen() {
                     fontSize = 16.sp,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 16.dp)
+                        .statusBarsPadding()
+                        .clickable {  }
                 )
             }
             Spacer(modifier = Modifier.size(20.dp))
@@ -474,11 +496,12 @@ private fun ProfileScreen() {
                     .padding(horizontal = 25.dp)
             )
             Spacer(modifier = Modifier.size(9.dp))
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(horizontal = 25.dp)
-                .background(colorResource(id = R.color.grey_light))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(horizontal = 25.dp)
+                    .background(colorResource(id = R.color.grey_light))
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
@@ -496,11 +519,12 @@ private fun ProfileScreen() {
                     .padding(horizontal = 25.dp)
             )
             Spacer(modifier = Modifier.size(10.dp))
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(horizontal = 25.dp)
-                .background(colorResource(id = R.color.grey_light))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(horizontal = 25.dp)
+                    .background(colorResource(id = R.color.grey_light))
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
@@ -518,11 +542,12 @@ private fun ProfileScreen() {
                     .padding(horizontal = 25.dp)
             )
             Spacer(modifier = Modifier.size(10.dp))
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .padding(horizontal = 25.dp)
-                .background(colorResource(id = R.color.grey_light))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .padding(horizontal = 25.dp)
+                    .background(colorResource(id = R.color.grey_light))
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
@@ -539,7 +564,7 @@ private fun ProfileScreen() {
                         horizontal = 36.dp,
                         vertical = 21.dp
                     )
-            ){
+            ) {
                 val items = listOf(
                     "Новокузнецк, Россия",
                     "Екатеринбург, Россия",
@@ -562,7 +587,6 @@ private fun ProfileScreen() {
                     }
                 }
             }
-            Spacer(modifier = Modifier.size(51.dp))
         }
     }
 }
