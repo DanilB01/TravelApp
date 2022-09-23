@@ -2,15 +2,14 @@ package ru.tsu.travelapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.ContentView
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -40,6 +39,11 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import ru.tsu.travelapp.network.Network
 import ru.tsu.travelapp.ui.theme.TravelAppTheme
 
 data class City(
@@ -62,6 +66,22 @@ private val bottomNavItems = listOf(
     BottomNavItem("Profile", R.drawable.ic_profile)
 )
 
+const val imageUrl =
+    "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
+
+val cities = listOf(
+    City("Новокузнецк", imageUrl, 5),
+    City("Екатеринбург", imageUrl, 4),
+    City("Калининград", imageUrl, 5),
+    City("Владивосток", imageUrl, 3),
+    City("Петропавловск-Камчатский", imageUrl, 2),
+    City("Иркутск", imageUrl, 0),
+    City("Казань", imageUrl, 4),
+    City("Воркута", imageUrl, 1),
+    City("Магадан", imageUrl, 5),
+    City("Архангельск", imageUrl, 2)
+)
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +98,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    SetupView()
+    MediaScreen()
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -179,7 +199,7 @@ private fun NavGraph(navController: NavHostController) {
         startDestination = bottomNavItems.first().name,
     ) {
         composable(bottomNavItems.first().name) { MainScreen() }
-        composable(bottomNavItems[1].name) {}
+        composable(bottomNavItems[1].name) { MediaScreen() }
         composable(bottomNavItems[2].name) {}
         composable(bottomNavItems[3].name) {}
         composable(bottomNavItems.last().name) { ProfileScreen() }
@@ -218,22 +238,6 @@ private fun MainScreen() {
             }
         )
     }
-
-    val imageUrl =
-        "https://mir-s3-cdn-cf.behance.net/project_modules/fs/731afa34542037.56d4c4da102e7.jpg"
-
-    val cities = listOf(
-        City("Новокузнецк", imageUrl, 5),
-        City("Екатеринбург", imageUrl, 4),
-        City("Калининград", imageUrl, 5),
-        City("Владивосток", imageUrl, 3),
-        City("Петропавловск-Камчатский", imageUrl, 2),
-        City("Иркутск", imageUrl, 0),
-        City("Казань", imageUrl, 4),
-        City("Воркута", imageUrl, 1),
-        City("Магадан", imageUrl, 5),
-        City("Архангельск", imageUrl, 2)
-    )
 
     var currentCities by remember { mutableStateOf(cities) }
 
@@ -472,7 +476,7 @@ private fun ProfileScreen() {
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .statusBarsPadding()
-                        .clickable {  }
+                        .clickable { }
                 )
             }
             Spacer(modifier = Modifier.size(20.dp))
@@ -586,6 +590,101 @@ private fun ProfileScreen() {
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+private fun MediaScreen() {
+    var dialogMessage by remember { mutableStateOf("") }
+    if (dialogMessage.isNotBlank()) {
+        AlertDialog(
+            title = {
+                Text(dialogMessage)
+            },
+            text = {
+                Text(dialogMessage)
+            },
+            onDismissRequest = {
+
+            },
+            buttons = {
+                Button(onClick = { dialogMessage = "" }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.statusBarsPadding()
+    ) {
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+//                val info = Network.retrofit.getInfo()
+//                item {
+//                    Card(
+//                        shape = RoundedCornerShape(16.dp),
+//                        backgroundColor = colorResource(id = R.color.grey_light)
+//                    ) {
+//                        Column {
+//                            Image(
+//                                painter = painterResource(id = R.drawable.pic_profile_blured),
+//                                contentDescription = null,
+//                                contentScale = ContentScale.Crop,
+//                                modifier = Modifier.height(150.dp)
+//                            )
+//                            Text (
+//                                text = info.title,
+//                                color = Color.Black,
+//                                fontSize = 13.sp,
+//                                modifier = Modifier
+//                                    .padding(top = 16.dp, start = 16.dp)
+//                            )
+//                            Text (
+//                                text = info.title,
+//                                color = Color.Black,
+//                                fontSize = 13.sp,
+//                                modifier = Modifier
+//                                    .padding(16.dp)
+//                            )
+//                        }
+//                    }
+//                }
+                itemsIndexed(
+                    items = cities
+                ) { i, city ->
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        backgroundColor = colorResource(id = R.color.grey_light)
+                    ) {
+                        Column(
+
+                        ) {
+                            AsyncImage(
+                                model = city.imageUrl , contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.height(150.dp)
+                            )
+                            Text (
+                                text = city.name,
+                                color = Color.Black,
+                                fontSize = 13.sp,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+                }
+            } catch (e:HttpException) {
+                dialogMessage = "${e.code()} ${e.response()}"
             }
         }
     }
